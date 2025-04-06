@@ -49,6 +49,7 @@ impl UserStack {
 }
 
 /// Get base address of app i.
+/// 计算每个应用的加载地址
 fn get_base_i(app_id: usize) -> usize {
     APP_BASE_ADDRESS + app_id * APP_SIZE_LIMIT
 }
