@@ -18,4 +18,4 @@ pushall.sh
 ci-user/
 user/
 os/vendor/
-bootloader/
+bootloader/rustsbi-qemu.bin
