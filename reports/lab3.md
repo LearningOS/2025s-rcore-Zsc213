@@ -6,6 +6,8 @@
 
 功能2的实现需要在task manager中存储各任务信息的TaskControlBlock结构体中增加记录系统调用次数的数组，并在task程序进行系统调用时于trap_handler中将调用次数记录在对应的结构中，sys_trace直接获得记录的调用次数。记录的函数在进入sys_call之前所以本次调用也会记录.
 
+
+
 #### 简答：
 
 1. user程序尝试执行特权指令会导致内核panic
@@ -14,9 +16,19 @@
    执行特权指令: IllegalInstruction in application, kernel killed it.
    访问特殊寄存器: IllegalInstruction in application, kernel killed it.
 
-2. (1)
+2. (1) 进入__restore时sp是程序内核栈的栈指针。restore会在第一次进入用户态和user程序的的系统调用返回回到用户态触发。第一次进入用户态内核会构造特殊上下文，在运行第一个user程序前通过restore从内核态进入用户态；user程序在系统调用trap_handler执行结束后由restore进行上下文恢复（对应触发系统调用的alltraps保存上下文）再返回用户态。
 
-   (2) 进入__restore时sp是程序内核栈的栈指针。restore会在第一次进入用户态和user程序的的系统调用返回回到用户态触发。第一次进入用户态内核会构造特殊上下文，在运行第一个user程序前通过restore从内核态进入用户态；user程序在系统调用trap_handler执行结束后由restore进行上下文恢复（对应触发系统调用的alltraps保存上下文）再返回用户态；
+   (2) t0,t1,t2分别用于保存并恢复sstatus程序状态、spec系统调用时程序的pc指针、sscratch程序的用户栈。
+
+   (3) 进入内核态保存点 上下文中x2传递给trap_handler的参数，恢复上下文时不需要使用；x4由于没有开启线程也不不需要使用。
+
+   (4) 该指令在系统调用结束后返回用户态时执行，sp指向程序的用户栈，sscratch指向程序的内核栈。
+
+   (5) sret后发生状态切换。由处理器自动执行状态切换，从spec中恢复pc等。
+
+   (6) 指令用于系统调用进入内核态后将程序的sscratch写入sp，sp指向内核栈，sscratch指向用户栈。
+
+   (7) 用户程序使用ecall指令触发系统调用由用户态进入内核态。
 
 
 
@@ -34,7 +46,8 @@
    >
    > rustsbi: https://docs.rs/rustsbi/latest/rustsbi/
    >
-   
+   > https://www.cnblogs.com/sureZ-learning/p/18306366
+
 3. 我独立完成了本次实验除以上方面之外的所有工作，包括代码与文档。 我清楚地知道，从以上方面获得的信息在一定程度上降低了实验难度，可能会影响起评分。
 
 4. 我从未使用过他人的代码，不管是原封不动地复制，还是经过了某些等价转换。 我未曾也不会向他人（含此后各届同学）复制或公开我的实验代码，我有义务妥善保管好它们。 我提交至本实验的评测系统的代码，均无意于破坏或妨碍任何计算机系统的正常运转。 我清楚地知道，以上情况均为本课程纪律所禁止，若违反，对应的实验成绩将按“-100”分计。
