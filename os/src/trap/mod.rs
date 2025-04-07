@@ -59,17 +59,17 @@ pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
         }
         Trap::Exception(Exception::StoreFault) | Trap::Exception(Exception::StorePageFault) => {
             println!("[kernel] PageFault in application, bad addr = {:#x}, bad instruction = {:#x}, kernel killed it.", stval, cx.sepc);
-            add_trap_times(cx.x[17]);
+            //add_trap_times(cx.x[17]);
             exit_current_and_run_next();
         }
         Trap::Exception(Exception::IllegalInstruction) => {
             println!("[kernel] IllegalInstruction in application, kernel killed it.");
-            add_trap_times(cx.x[17]);
+            //add_trap_times(cx.x[17]);
             exit_current_and_run_next();
         }
         Trap::Interrupt(Interrupt::SupervisorTimer) => {
             set_next_trigger();
-            add_trap_times(cx.x[17]);
+            //add_trap_times(cx.x[17]);
             suspend_current_and_run_next();
         }
         _ => {
